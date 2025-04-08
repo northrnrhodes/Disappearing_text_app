@@ -3,19 +3,19 @@ import threading
 
 
 class Brains:
-    def __init__(self):
-        self.window = Tk()
-
+    def __init__(self, window):
+        # self.window = Tk()
+        self.window = window
         self.window.geometry("800x600")
         self.window.title("Disappearing Text App")
         self.window.config(bg='black')
-        self.text_canvas = Canvas(width=500, height=500)
-        self.clock = Label(text="Type whatever is on your mind....", font=('Arial', 20, 'normal'), bg='black')
+        self.clock = Label(text="Type whatever is on your mind....", font=('Arial', 20, 'normal'), bg='black', fg='white')
         self.clock.pack(pady=20)
-        self.entry = Text(width=75, height=25, font=("Arial", 16, 'normal'), bg='black', highlightthickness=0)
+        self.entry = Text(width=75, height=25, font=("Arial", 16, 'normal'), bg='black', highlightthickness=0, fg='white')
         self.entry.pack()
         self.entry.focus()
         self.entry.bind('<KeyPress>', self.typing_started)
+        self.entry.bind('<KeyRelease>', self.on_key_release)
         self.close = Button(text='QUIT',
                             command=self.close_window,
                             bg='white',
@@ -30,12 +30,14 @@ class Brains:
         self.typing = False
         self.timer = None
         self.typing_timer = None
-        self.window.mainloop()
+        # self.window.mainloop()
 
 
     def close_window(self):
         if self.timer:
             self.timer.cancel()
+        if self.typing_timer:
+            self.window.after_cancel(self.typing_timer)
         self.window.destroy()
         print('Program terminated.')
 
@@ -58,7 +60,7 @@ class Brains:
     def typing_started(self, event):
         self.stop_time = 5
         self.clock.config(text='Typing!', fg='green')
-        self.entry.bind('<KeyRelease>', self.on_key_release)
+
         if self.timer is not None:
             self.timer.cancel()
         self.typing = True
@@ -83,4 +85,9 @@ class Brains:
             self.window.after(self.time_delay, self.delete_timer)
 
 
-brains = Brains()
+
+
+if __name__ == "__main__":
+    window = Tk()
+    app = Brains(window)
+    window.mainloop()
